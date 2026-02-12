@@ -1,7 +1,6 @@
 #!/bin/sh
 # NOTE: do not modify this, unless you know what you are doing
 
-export TORCH_NCCL_AVOID_RECORD_STREAMS=1
 export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 
 export MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)

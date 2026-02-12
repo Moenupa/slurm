@@ -2,9 +2,7 @@
 
 __doc__ = f"""
 Get arg1.split(DELIM)[IDX]. E.g.:
-    DELIM=","
-    IDX=0
-    python3 {__file__} "a,b,c"
+    DELIM="," IDX=0 python3 {__file__} "a,b,c"
     => "a"
 Raises:
     KeyError: if DELIM or IDX not set in env.
@@ -15,7 +13,6 @@ __email__ = "49304833+Moenupa@users.noreply.github.com"
 
 import os
 import sys
-
 
 DELIM = os.environ["DELIM"]
 IDX = os.environ["IDX"]

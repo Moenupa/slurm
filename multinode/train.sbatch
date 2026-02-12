@@ -15,6 +15,8 @@
 # this trajectory == a linked list.
 # give proper dataset names to manage this tree of models.
 
+. .venv/bin/activate
+
 set -e
 set -x
 
@@ -27,11 +29,14 @@ MODELID=$(DELIM='/' IDX=0 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 SRC=$(DELIM='/' IDX=1 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 DEST=$(DELIM='/' IDX=2 python3 slurm/src/argv.py "$SLURM_JOB_NAME") # registered dataset name
 
+# if data is too long, set DATA env var before sbatch
+DATA=${DATA:-$DEST}
+
 # overrides the META-configs
 ARGS=""
 ARGS="$ARGS model_name_or_path=$MODEL_DIR/$SRC/$MODELID"
 ARGS="$ARGS output_dir=$MODEL_DIR/$SRC-$DEST/$MODELID"
-ARGS="$ARGS dataset=$DEST"
+ARGS="$ARGS dataset=$DATA"
 ARGS="$ARGS per_device_train_batch_size=2"
 ARGS="$ARGS gradient_accumulation_steps=16"
 
