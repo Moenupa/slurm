@@ -50,38 +50,42 @@ fi
 export MASTER_PORT=29500
 export GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:-8}
 export NNODES=${SLURM_NNODES:-1}
+export NUM_PROCESSES=$(expr $NNODES \* $GPUS_PER_NODE)
+export NPROC_PER_NODE=$GPUS_PER_NODE
 
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
+	--master_addr=$MASTER_ADDR \
+	--master_port=$MASTER_PORT \
 	--nnodes=$NNODES \
 	--nproc_per_node=$GPUS_PER_NODE \
-    --load_from_cache_file true \
-    --train_type full \
-    --freeze_vit false \
-    --freeze_aligner false \
-    --freeze_llm false \
-    --gradient_checkpointing true \
-    --torch_dtype bfloat16 \
-    --per_device_train_batch_size 16 \
-    --gradient_accumulation_steps 2 \
-    --sequence_parallel_size 2 \
-    --save_total_limit 3 \
-    --eval_strategy "no" \
-    --save_only_model true \
-    --save_strategy epoch \
-    --report_to wandb \
-    --num_train_epochs 3 \
-    --max_epochs 3 \
-    --max_length 32768 \
-    --max_new_tokens 1024 \
-    --learning_rate 1e-5 \
-    --lr_scheduler_type cosine \
-    --dataloader_num_workers 28 \
-    --dataset_num_proc 28 \
-    --deepspeed zero3 \
-    --warmup_ratio 0.1 \
-    --attn_impl flash_attn \
-    --logging_steps 10 \
-    --use_logits_to_keep false \
-    --padding_free true \
+	--load_from_cache_file true \
+	--train_type full \
+	--freeze_vit false \
+	--freeze_aligner false \
+	--freeze_llm false \
+	--gradient_checkpointing true \
+	--torch_dtype bfloat16 \
+	--per_device_train_batch_size 16 \
+	--gradient_accumulation_steps 2 \
+	--sequence_parallel_size 2 \
+	--save_total_limit 3 \
+	--eval_strategy "no" \
+	--save_only_model true \
+	--save_strategy epoch \
+	--report_to wandb \
+	--num_train_epochs 3 \
+	--max_epochs 3 \
+	--max_length 32768 \
+	--max_new_tokens 1024 \
+	--learning_rate 1e-5 \
+	--lr_scheduler_type cosine \
+	--dataloader_num_workers 28 \
+	--dataset_num_proc 28 \
+	--deepspeed zero3 \
+	--warmup_ratio 0.1 \
+	--attn_impl flash_attn \
+	--logging_steps 10 \
+	--use_logits_to_keep false \
+	--padding_free true \
 	$ARGS \
 	$@

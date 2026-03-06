@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # NOTE: do not modify this, unless you know what you are doing
 
 export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
