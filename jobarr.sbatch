@@ -11,8 +11,8 @@
 #SBATCH --array=0-0
 
 # for env debugging
-echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
-python slurm/src/check_env.py
+# echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
+# python src/check_env.py
 
 set -e
 set -x

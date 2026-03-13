@@ -41,23 +41,7 @@ ARGS="$ARGS --dataset=$DATA"
 
 export MODELSCOPE_CACHE=$HOME/.cache/modelscope
 
-if command -v scontrol &> /dev/null
-then
-	export MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
-else
-	export MASTER_ADDR=localhost
-fi
-export MASTER_PORT=29500
-export GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:-8}
-export NNODES=${SLURM_NNODES:-1}
-export NUM_PROCESSES=$(expr $NNODES \* $GPUS_PER_NODE)
-export NPROC_PER_NODE=$GPUS_PER_NODE
-
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
-	--master_addr=$MASTER_ADDR \
-	--master_port=$MASTER_PORT \
-	--nnodes=$NNODES \
-	--nproc_per_node=$GPUS_PER_NODE \
 	--load_from_cache_file true \
 	--train_type full \
 	--freeze_vit false \

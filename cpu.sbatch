@@ -12,3 +12,4 @@ set -e
 set -x
 
 # TODO: run here
+$@
