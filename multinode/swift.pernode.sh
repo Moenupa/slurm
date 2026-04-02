@@ -15,10 +15,10 @@ export NPROC_PER_NODE=$GPUS_PER_NODE
 export TOKENIZERS_PARALLELISM=true
 
 torchrun \
-    --master_port $MASTER_PORT \
-    --master_addr $MASTER_ADDR \
-    --nproc_per_node=$NPROC_PER_NODE \
-    --nnodes=$NNODES \
-    --node_rank=$NODE_RANK \
-    -m swift.cli.sft \
-    $@ 
+	--master_port $MASTER_PORT \
+	--master_addr $MASTER_ADDR \
+	--nproc_per_node=$NPROC_PER_NODE \
+	--nnodes=$NNODES \
+	--node_rank=$NODE_RANK \
+	-m swift.cli.sft \
+	$@ 

@@ -5,6 +5,7 @@ root = true
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+remove_trailing_whitespace = true
 
 [*.{sh,sbatch}]
 indent_style = tab

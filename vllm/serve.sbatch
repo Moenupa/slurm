@@ -22,7 +22,7 @@ VLLM_VER=${VLLM_VER:-0.16.0}
 # run vllm 
 uvx --python 3.12 --with "transformers<${TF_VER}" vllm@$VLLM_VER serve \
 	$SLURM_JOB_NAME \
-    --trust-remote-code \
+	--trust-remote-code \
 	--port $SLURM_JOB_ID \
 	--served-model-name $(basename $SLURM_JOB_NAME) \
 	-dp $SLURM_GPUS_ON_NODE \

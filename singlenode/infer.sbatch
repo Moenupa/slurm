@@ -26,14 +26,14 @@ RESULT_SAVE_TO=${RESULT_SAVE_TO:-"$RESULT_DIR/$MODELID/$TESTSET"}
 
 mkdir -p $RESULT_SAVE_TO
 uv run scripts/vllm_infer.py \
-    --model_name_or_path $MODEL_IN_DIR/$MODELID \
-    --dataset $TESTSET \
-    --template "qwen3_vl_nothink" \
-    --cutoff_len 30720 \
-    --max_new_tokens 2048 \
+	--model_name_or_path $MODEL_IN_DIR/$MODELID \
+	--dataset $TESTSET \
+	--template "qwen3_vl_nothink" \
+	--cutoff_len 30720 \
+	--max_new_tokens 2048 \
 	--enable_thinking false \
 	--temperature 0.7 \
 	--top_k 20 \
 	--top_p 0.8 \
-    --save_name $RESULT_SAVE_TO/generated_predictions.jsonl \
+	--save_name $RESULT_SAVE_TO/generated_predictions.jsonl \
 	$@
