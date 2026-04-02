@@ -5,7 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-gpu=12
-#SBATCH --mem-per-gpu=60G
+#SBATCH --mem-per-gpu=128G
 #SBATCH --gres=gpu:1
 #SBATCH -J Qwen3-VL-2B-Instruct/trainset/testset
 
@@ -50,7 +50,9 @@ RESULT_SAVE_TO=${RESULT_SAVE_TO:-"$MODEL_OUT_DIR/$TRAINSET/$TESTSET"}
 if [ "${CLI_TRAIN:-0}" -ne 0 ]; then
     llamafactory-cli train $TRAIN_CONFIG \
         $BASE_ARGS \
-		do_train=false do_predict=false report_to=wandb \
+		do_train=true do_predict=false report_to=wandb \
+		mix_strategy=interleave_once \
+		save_strategy=epoch plot_lose=false overwrite_output_dir=false save_only_model=true \
         output_dir=$LORA_SAVE_TO \
         $@
 fi

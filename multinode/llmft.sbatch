@@ -51,7 +51,7 @@ export GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:-8}
 export NNODES=${SLURM_NNODES:-1}
 export NUM_PROCESSES=$(expr $NNODES \* $GPUS_PER_NODE)
 
-echo srun --mpi=pmix slurm/multinode/llmft.pernode.sh\
+echo srun --mpi=pmix slurm/multinode/llmft.pernode.sh \
 	$CONFIG \
 	$ARGS \
 	$@
