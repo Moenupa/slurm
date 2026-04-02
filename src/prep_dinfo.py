@@ -81,6 +81,10 @@ def get_tags(formatting: str) -> dict:
     return {"tags": tag_mapping}
 
 
+def get_formatting(formatting: str) -> dict:
+    return {"formatting": {"openai": "sharegpt"}.get(formatting, formatting)}
+
+
 def get_dset_info(
     hf_path: str,
     subset: str = "default",
@@ -91,8 +95,8 @@ def get_dset_info(
             "hf_hub_url": hf_path,
             "subset": subset,
             "split": split,
-            "formatting": FORMAT,
         }
+        | get_formatting(FORMAT)
         | get_columns(FORMAT)
         | get_tags(FORMAT)
     )
@@ -119,7 +123,6 @@ if __name__ == "__main__":
     with open(sys.argv[1], "w", encoding="utf-8") as f:
         json.dump(d_to_write, f, indent=4, ensure_ascii=False)
 
-    exit(0)
     subprocess.run(["rm", "data/dataset_info.json"], check=False)
     subprocess.run(
         ["ln", "-s", os.path.basename(sys.argv[1]), "data/dataset_info.json"],
