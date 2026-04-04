@@ -42,7 +42,7 @@ TESTSET=$(DELIM='/' IDX=2 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 BASE_ARGS="model_name_or_path=$MODEL_IN_DIR/$MODELID dataset=$TRAINSET eval_dataset=$TESTSET"
 
 # output paths
-MODEL_OUT_DIR=saves/$MODELID
+MODEL_OUT_DIR=${MODEL_OUT_DIR:-"saves/$MODELID"}
 TRAINSET_PATH=$(echo $TRAINSET | tr ',' ';')
 TESTSET_PATH=$(echo $TESTSET | tr ',' ';')
 LORA_SAVE_TO=${LORA_SAVE_TO:-"$MODEL_OUT_DIR/$TRAINSET_PATH/$TRAINSET_PATH"}

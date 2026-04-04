@@ -16,9 +16,9 @@ Env Var:
 __author__ = "Meng Wang"
 __email__ = "49304833+Moenupa@users.noreply.github.com"
 
+import json
 import os
 import sys
-import json
 
 
 MODEL = os.getenv("MODEL", "Qwen3-VL-4B-Instruct")
@@ -27,16 +27,12 @@ CLI_TRAIN = os.getenv("CLI_TRAIN", "1")
 CLI_TEST = os.getenv("CLI_TEST", "1")
 SRC = os.getenv("SRC", "slurm/singlenode/lora.sbatch")
 
-with open(TARGET, "r", encoding="utf-8") as f:
+with open(TARGET, encoding="utf-8") as f:
     dataset_info: dict[str, dict] = json.load(f)
-    assert isinstance(dataset_info, dict), (
-        f"Expected dict in {TARGET}, got {type(dataset_info)}"
-    )
+    assert isinstance(dataset_info, dict), f"Expected dict in {TARGET}, got {type(dataset_info)}"
 
     ENTRY: set[str] = set(dataset_info.keys())  # ty:ignore[invalid-assignment]
-    ENTRY_SET = set(
-        e.replace("_train", "").replace("_val", "").replace("_test", "") for e in ENTRY
-    )
+    ENTRY_SET = set(e.replace("_train", "").replace("_val", "").replace("_test", "") for e in ENTRY)
 
 
 def get_train_test_set(dataset: str) -> tuple[str, str]:

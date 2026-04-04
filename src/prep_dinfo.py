@@ -14,10 +14,10 @@ Env Var:
 __author__ = "Meng Wang"
 __email__ = "49304833+Moenupa@users.noreply.github.com"
 
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
 
 
 TARGET = os.getenv("TARGET", "data/dataset_info.json")
