@@ -55,14 +55,14 @@ if [ "${CLI_TRAIN:-0}" -ne 0 ]; then
 		do_train=true do_predict=false report_to=wandb \
 		mix_strategy=interleave_once \
 		save_strategy=epoch plot_loss=false overwrite_output_dir=false save_only_model=true \
-		output_dir=$LORA_SAVE_TO \
-		$@
+		$@ \
+		output_dir=$LORA_SAVE_TO
 fi
 if [ "${CLI_TEST:-0}" -ne 0 ]; then
 	llamafactory-cli train $TRAIN_CONFIG \
 		$BASE_ARGS \
 		do_train=false do_predict=true predict_with_generate=true report_to=none \
+		$@ \
 		adapter_name_or_path=$LORA_SAVE_TO \
-		output_dir=$RESULT_SAVE_TO \
-		$@
+		output_dir=$RESULT_SAVE_TO
 fi

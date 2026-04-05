@@ -4,7 +4,7 @@
 #SBATCH -t 30-00:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gpus-per-node=0
+#SBATCH --gpus-per-node=8
 #SBATCH --mem=0
 #SBATCH --exclusive
 #SBATCH -J Qwen3-VL-4B-Instruct/Qwen/m3llm
@@ -20,9 +20,12 @@
 set -e
 set -x
 
+export WANDB_NAME=$SLURM_JOB_NAME
+export WANDB_RUN_GROUP=llmft
+
 # META-configs
 MODEL_DIR=saves
-CONFIG=examples/train_full/qwen2_5vl_full_sft.yaml
+CONFIG=examples/train_full/qwen3vl_full_sft.yaml
 
 # parse SLURM_JOB_NAME for training
 MODELID=$(DELIM='/' IDX=0 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
@@ -35,10 +38,10 @@ DATA=${DATA:-$DEST}
 # overrides the META-configs
 ARGS=""
 ARGS="$ARGS model_name_or_path=$MODEL_DIR/$SRC/$MODELID"
-ARGS="$ARGS output_dir=$MODEL_DIR/$SRC-$DEST/$MODELID"
+ARGS="$ARGS output_dir=$MODEL_DIR/$SRC:$DEST/$MODELID"
 ARGS="$ARGS dataset=$DATA"
 ARGS="$ARGS per_device_train_batch_size=2"
-ARGS="$ARGS gradient_accumulation_steps=16"
+ARGS="$ARGS gradient_accumulation_steps=2"
 
 if command -v scontrol &> /dev/null
 then
@@ -51,7 +54,7 @@ export GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:-8}
 export NNODES=${SLURM_NNODES:-1}
 export NUM_PROCESSES=$(expr $NNODES \* $GPUS_PER_NODE)
 
-echo srun --mpi=pmix slurm/multinode/llmft.pernode.sh \
+srun --mpi=pmix slurm/multinode/llmft.pernode.sh \
 	$CONFIG \
 	$ARGS \
 	$@
