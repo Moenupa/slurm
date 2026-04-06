@@ -10,8 +10,7 @@
 #SBATCH -J Qwen3-VL-4B-Instruct/Qwen/m3llm
 
 # train model by job name `model/src/dest`, e.g. `Qwen3-8B/Qwen/m3llm`
-# Qwen/Qwen3-8B ---data=m3llm--> Qwen-m3llm/Qwen3-8B
-
+# Qwen/Qwen3-8B ---data=m3llm--> Qwen:m3llm/Qwen3-8B
 # this trajectory == a linked list.
 # give proper dataset names to manage this tree of models.
 
@@ -24,7 +23,7 @@ export WANDB_NAME=$SLURM_JOB_NAME
 export WANDB_RUN_GROUP=llmft
 
 # META-configs
-MODEL_DIR=saves
+MODEL_DIR=${MODEL_DIR:-saves}
 CONFIG=examples/train_full/qwen3vl_full_sft.yaml
 
 # parse SLURM_JOB_NAME for training
