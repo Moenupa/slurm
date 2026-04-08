@@ -1,21 +1,12 @@
 #!/bin/python3
 
-__doc__ = """
+__doc__ = f"""
 Checks the installation and availability of PyTorch CUDA components.
-
-Specifically, it verifies:
-- torch: version, CUDA version, CUDA availability.
-- flash_attn: version, torch availability.
-- vllm: version.
-
-Returns:
-    A formatted string indicating the status of the components.
-
-Example::
-    python check_torch.py
-
-Raises:
-    None
+Usage:
+    python {__file__}
+    # torch@2.8.0+cu128(12.8): True
+    # flash_attn@2.8.3: True
+    # vllm@0.11.0
 """
 __author__ = "Meng Wang"
 __email__ = "49304833+Moenupa@users.noreply.github.com"
