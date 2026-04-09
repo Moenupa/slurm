@@ -5,9 +5,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-gpu=12
-#SBATCH --mem-per-gpu=64G
+#SBATCH --mem-per-gpu=80G
 #SBATCH --gres=gpu:1
-#SBATCH -J Qwen3-VL-2B-Instruct/testset
+#SBATCH -J Qwen3-VL-2B-Instruct/hf/testset
 
 
 export DISABLE_VERSION_CHECK=1
@@ -15,13 +15,14 @@ export DISABLE_VERSION_CHECK=1
 set -e
 set -x
 
-MODEL_IN_DIR=${MODEL_IN_DIR:-'saves/hf'}
-RESULT_DIR=${RESULT_DIR:-'saves/hf_results'}
 
 # parse SLURM_JOB_NAME for testing
 MODELID=$(DELIM='/' IDX=0 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
-TESTSET=$(DELIM='/' IDX=1 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
+TRAINSET=$(DELIM='/' IDX=1 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
+TESTSET=$(DELIM='/' IDX=2 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 
+MODEL_IN_DIR=${MODEL_IN_DIR:-"saves/$TRAINSET"}
+RESULT_DIR=${RESULT_DIR:-"saves/$TRAINSET"}
 RESULT_SAVE_TO=${RESULT_SAVE_TO:-"$RESULT_DIR/$MODELID/$TESTSET"}
 
 mkdir -p $RESULT_SAVE_TO
