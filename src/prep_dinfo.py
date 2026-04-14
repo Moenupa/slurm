@@ -117,11 +117,11 @@ if __name__ == "__main__":
                 d_to_write[entry] = get_dset_info(hf_path, subset, split)
 
     if len(sys.argv) == 1:
-        print(json.dumps(d_to_write, indent=4, ensure_ascii=False))
+        print(json.dumps(d_to_write, indent="\t", ensure_ascii=False))
         exit(0)
 
     with open(sys.argv[1], "w", encoding="utf-8") as f:
-        json.dump(d_to_write, f, indent=4, ensure_ascii=False)
+        json.dump(d_to_write, f, indent="\t", ensure_ascii=False)
 
     subprocess.run(["rm", "data/dataset_info.json"], check=False)
     subprocess.run(

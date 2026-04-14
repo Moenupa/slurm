@@ -16,60 +16,64 @@
 # give proper dataset names to manage this tree of models.
 
 . .venv/bin/activate
+export MODELSCOPE_CACHE=/tmp/ms
+export USE_HF=1
+export CELOSS_PARALLEL_SIZE=${CELOSS_PARALLEL_SIZE:-2048}
+export SLURM_NNODES=${SLURM_NNODES:-1}
+export SLURM_GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:-8}
 
 set -e
 set -x
-
-# META-configs
-MODEL_DIR=saves
-CONFIG=examples/train_full/qwen3vl_full_sft.yaml
 
 # parse SLURM_JOB_NAME for training
 MODELID=$(DELIM='/' IDX=0 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 SRC=$(DELIM='/' IDX=1 python3 slurm/src/argv.py "$SLURM_JOB_NAME")
 DEST=$(DELIM='/' IDX=2 python3 slurm/src/argv.py "$SLURM_JOB_NAME") # registered dataset name
 
+# second-order overrides
+MODEL_DIR=${MODEL_DIR:-saves}
 IN=${IN:-"$MODEL_DIR/$SRC/$MODELID"}
-OUT=${OUT:-"$MODEL_DIR/$SRC-$DEST/$MODELID"}
+OUT=${OUT:-"$MODEL_DIR/$SRC:$DEST/$MODELID"}
 DATA=${DATA:-$DEST}
 
-# overrides the META-configs
 ARGS=""
 ARGS="$ARGS --model=$IN"
 ARGS="$ARGS --output_dir=$OUT"
 ARGS="$ARGS --dataset=$DATA"
 
-export MODELSCOPE_CACHE=$HOME/.cache/modelscope
+export MICRO_BS=16
+export GRAD_ACC=$(expr 1024 / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICRO_BS)
 
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
-	--load_from_cache_file true \
-	--train_type full \
-	--freeze_vit false \
+	--attn_impl flash_attn \
+	--dataloader_num_workers 8 \
+	--dataset_num_proc 8 \
+	--deepspeed zero3 \
+	--eval_strategy "no" \
 	--freeze_aligner false \
 	--freeze_llm false \
-	--gradient_checkpointing true \
-	--torch_dtype bfloat16 \
-	--per_device_train_batch_size 16 \
-	--gradient_accumulation_steps 2 \
-	--sequence_parallel_size 2 \
-	--save_total_limit 3 \
-	--eval_strategy "no" \
-	--save_only_model true \
-	--save_strategy epoch \
-	--report_to wandb \
-	--num_train_epochs 3 \
+	--freeze_vit false \
+	--gradient_accumulation_steps $GRAD_ACC \
+	--gradient_checkpointing false \
+	--learning_rate 1e-5 \
+	--load_from_cache_file true \
+	--logging_steps 10 \
 	--max_epochs 3 \
 	--max_length 32768 \
 	--max_new_tokens 1024 \
-	--learning_rate 1e-5 \
-	--lr_scheduler_type cosine \
-	--dataloader_num_workers 28 \
-	--dataset_num_proc 28 \
-	--deepspeed zero3 \
-	--warmup_ratio 0.1 \
-	--attn_impl flash_attn \
-	--logging_steps 10 \
-	--use_logits_to_keep false \
+	--num_train_epochs 3 \
 	--padding_free true \
+	--per_device_train_batch_size $MICRO_BS \
+	--report_to wandb \
+	--save_only_model true \
+	--save_strategy epoch \
+	--save_total_limit 3 \
+	--sequence_parallel_size 2 \
+	--torch_dtype bfloat16 \
+	--tuner_type full \
+	--use_liger_kernel true \
+	--use_logits_to_keep true \
+	--vit_gradient_checkpointing false \
+	--warmup_ratio 0.1 \
 	$ARGS \
 	$@
