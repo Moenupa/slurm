@@ -17,6 +17,7 @@
 
 . .venv/bin/activate
 export MODELSCOPE_CACHE=/tmp/ms
+export TRITON_HOME=/tmp/triton
 export USE_HF=1
 export CELOSS_PARALLEL_SIZE=${CELOSS_PARALLEL_SIZE:-2048}
 export SLURM_NNODES=${SLURM_NNODES:-1}
@@ -42,7 +43,8 @@ ARGS="$ARGS --output_dir=$OUT"
 ARGS="$ARGS --dataset=$DATA"
 
 export MICRO_BS=16
-export GRAD_ACC=$(expr 1024 / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICRO_BS)
+export SP=2
+export GRAD_ACC=$(expr 512 \* $SP / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICRO_BS)
 
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--attn_impl flash_attn \
@@ -54,7 +56,7 @@ srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--freeze_llm false \
 	--freeze_vit false \
 	--gradient_accumulation_steps $GRAD_ACC \
-	--gradient_checkpointing false \
+	--gradient_checkpointing true \
 	--learning_rate 1e-5 \
 	--load_from_cache_file true \
 	--logging_steps 10 \
@@ -68,12 +70,12 @@ srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--save_only_model true \
 	--save_strategy epoch \
 	--save_total_limit 3 \
-	--sequence_parallel_size 2 \
+	--sequence_parallel_size $SP \
 	--torch_dtype bfloat16 \
 	--tuner_type full \
 	--use_liger_kernel true \
-	--use_logits_to_keep true \
-	--vit_gradient_checkpointing false \
+	--use_logits_to_keep false \
+	--vit_gradient_checkpointing true \
 	--warmup_ratio 0.1 \
 	$ARGS \
 	$@
