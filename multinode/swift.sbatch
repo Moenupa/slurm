@@ -42,9 +42,12 @@ ARGS="$ARGS --model=$IN"
 ARGS="$ARGS --output_dir=$OUT"
 ARGS="$ARGS --dataset=$DATA"
 
-export MICRO_BS=16
-export SP=2
-export GRAD_ACC=$(expr 512 \* $SP / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICRO_BS)
+EPOCHS=${EPOCHS:-2}
+
+GLOBAL_BS=${GLOBAL_BS:-512}
+MICRO_BS=${MICRO_BS:-16}
+SP=${SP:-2}
+GRAD_ACC=$(expr $GLOBAL_BS \* $SP / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICRO_BS)
 
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--attn_impl flash_attn \
@@ -58,18 +61,19 @@ srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--gradient_accumulation_steps $GRAD_ACC \
 	--gradient_checkpointing true \
 	--learning_rate 1e-5 \
+	--vit_lr 2e-6 \
 	--load_from_cache_file true \
 	--logging_steps 10 \
-	--max_epochs 3 \
+	--max_epochs $EPOCHS \
 	--max_length 32768 \
 	--max_new_tokens 1024 \
-	--num_train_epochs 3 \
+	--num_train_epochs $EPOCHS \
 	--padding_free true \
 	--per_device_train_batch_size $MICRO_BS \
 	--report_to wandb \
 	--save_only_model true \
 	--save_strategy epoch \
-	--save_total_limit 3 \
+	--save_total_limit $EPOCHS \
 	--sequence_parallel_size $SP \
 	--torch_dtype bfloat16 \
 	--tuner_type full \

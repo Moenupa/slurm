@@ -11,6 +11,8 @@ Usage:
 
 Env Var:
     - AFTER: dependency type (default: 'afterok').
+    - FIRST: dependency for the first job
+    - ALL: dependency for all jobs (overrides FIRST and subsequent dependencies)
     - EXE: executable to use for submission (default: 'sbatch').
 """
 __author__ = "Meng Wang"
@@ -24,8 +26,11 @@ import sys
 AFTER = os.getenv("AFTER", "afterok")
 EXE = os.getenv("EXE", "sbatch")
 
+FIRST = os.getenv("FIRST", None)
+ALL = os.getenv("ALL", None)
 
-def submit_one(cmd: list[str], dependency: int | None = None) -> int:
+
+def submit_one(cmd: list[str], dependency: int | str | None = None) -> int:
     cmd = [c for c in cmd if c not in (EXE, "sbatch", "sb")]
 
     if dependency is not None:
@@ -37,7 +42,9 @@ def submit_one(cmd: list[str], dependency: int | None = None) -> int:
     stderr = result.stderr.decode().strip()
 
     if result.returncode != 0:
-        raise RuntimeError(f"Error {result.returncode} submitting {' '.join(cmd)}\nError:{stderr}")
+        raise RuntimeError(
+            f"Error {result.returncode} submitting {' '.join(cmd)}\nError:{stderr}"
+        )
 
     print("+", " ".join(cmd), file=sys.stderr)
     print(stdout)
@@ -50,6 +57,6 @@ if __name__ == "__main__":
         print(__doc__)
         exit(1)
 
-    dependency = None
+    dependency = FIRST
     for line in sys.stdin:
-        dependency = submit_one(line.split(), dependency)
+        dependency = submit_one(line.split(), ALL or dependency)
