@@ -51,8 +51,8 @@ GRAD_ACC=$(expr $GLOBAL_BS \* $SP / $SLURM_NNODES / $SLURM_GPUS_PER_NODE / $MICR
 
 srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--attn_impl flash_attn \
-	--dataloader_num_workers 8 \
-	--dataset_num_proc 8 \
+	--dataloader_num_workers 28 \
+	--dataset_num_proc 28 \
 	--deepspeed zero3 \
 	--eval_strategy "no" \
 	--freeze_aligner false \
@@ -61,7 +61,6 @@ srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--gradient_accumulation_steps $GRAD_ACC \
 	--gradient_checkpointing true \
 	--learning_rate 1e-5 \
-	--vit_lr 2e-6 \
 	--load_from_cache_file true \
 	--logging_steps 10 \
 	--max_epochs $EPOCHS \
@@ -80,6 +79,7 @@ srun --mpi=pmix slurm/multinode/swift.pernode.sh \
 	--use_liger_kernel true \
 	--use_logits_to_keep false \
 	--vit_gradient_checkpointing true \
+	--vit_lr 2e-6 \
 	--warmup_ratio 0.1 \
 	$ARGS \
 	$@
